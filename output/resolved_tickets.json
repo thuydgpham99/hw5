@@ -1,0 +1,283 @@
+{
+  "run": {
+    "shop_today": "2026-08-31",
+    "model": "gpt-6-luna",
+    "database": "data/campus_customs_new.db",
+    "starting_checking_balance": 3400.0,
+    "ending_checking_balance": 152.0,
+    "total_paid": 3248.0,
+    "note": "Reset from data/campus_customs.db before the run; every payment below was approved by a human in the dashboard before any cash moved."
+  },
+  "tickets": [
+    {
+      "id": 101,
+      "subject": "Bulldog tee",
+      "requester": "Tauhid Zaman",
+      "final_status": "resolved",
+      "outcome": "Invoice #501 ($840.00) paid, which unblocked Bulldog Print Co; PO #1 for the one missing size-S tee ($8.00) placed and paid; customer draft left on the board. Restock arrives 2026-09-05.",
+      "runs": 9,
+      "agents_involved": [
+        "accounting",
+        "boss",
+        "customer_service",
+        "inventory"
+      ],
+      "delegations": [
+        "boss -> accounting",
+        "boss -> customer_service",
+        "boss -> inventory",
+        "customer_service -> inventory",
+        "inventory -> accounting"
+      ],
+      "agent_contributions": {
+        "accounting": {
+          "what_they_did": "Read invoice #501 ($840.00, 3 days overdue) against the $3,400.00 balance and queued approval #1; later queued approval #2 for PO #1 at $8.00.",
+          "mcp_tools_used": [
+            "get_invoice",
+            "get_cash_balance",
+            "list_pending_approvals",
+            "get_shop_today",
+            "request_payment_approval",
+            "list_purchase_orders"
+          ]
+        },
+        "boss": {
+          "what_they_did": "Read the ticket, routed it to inventory first, pulled in accounting once the blocker turned out to be money, brought customer service in for the reply, and closed the ticket as resolved with the 2026-09-05 arrival in the note.",
+          "mcp_tools_used": [
+            "get_ticket",
+            "get_shop_today",
+            "get_cash_balance",
+            "check_stock",
+            "list_pending_approvals",
+            "update_ticket_status",
+            "list_purchase_orders",
+            "list_drafts",
+            "get_invoice"
+          ]
+        },
+        "customer_service": {
+          "what_they_did": "Drafted the reply to Tauhid Zaman explaining the size S was out of stock and giving the restock date as conditional, not promised.",
+          "mcp_tools_used": [
+            "get_ticket",
+            "save_draft_message",
+            "list_drafts",
+            "get_shop_today",
+            "check_stock",
+            "list_purchase_orders",
+            "list_pending_approvals",
+            "get_invoice"
+          ]
+        },
+        "inventory": {
+          "what_they_did": "Found CC-TEE-WHITE size S at qty 0 (shortfall 1), identified Bulldog Print Co as the only apparel-reprint vendor and that invoice #501 was blocking them, then created PO #1 for 1 unit at $8.00 once the invoice cleared.",
+          "mcp_tools_used": [
+            "check_stock",
+            "find_restock_options",
+            "get_shop_today",
+            "get_ticket",
+            "list_purchase_orders",
+            "create_purchase_order",
+            "list_pending_approvals",
+            "list_tickets"
+          ]
+        }
+      },
+      "human_approvals": [
+        {
+          "approval_id": 1,
+          "kind": "invoice",
+          "ref_id": 501,
+          "amount": 840.0,
+          "status": "paid",
+          "requested_by_agent": "accounting",
+          "approved_by_human": "Jennifer Pham",
+          "decided_at": "2026-08-31",
+          "payment_id": 1,
+          "reason_shown_to_human": "Invoice #501 is open and 3 days overdue as of shop date 2026-08-31. Paying now clears Bulldog Print Co's shipping block for the rush reprint CC-TEE-WHITE S; if it waits, the vendor remains unable to ship. Checking balance is $3,400.00, so this $840.00 request is affordable, leaving $2,560.00 if all requests are paid."
+        },
+        {
+          "approval_id": 2,
+          "kind": "purchase_order",
+          "ref_id": 1,
+          "amount": 8.0,
+          "status": "paid",
+          "requested_by_agent": "accounting",
+          "approved_by_human": "Jennifer Pham",
+          "decided_at": "2026-08-31",
+          "payment_id": 2,
+          "reason_shown_to_human": "Queue PO #1 for the one-unit CC-TEE-WHITE size S restock on Ticket #101. The recorded PO total is $8.00, and the vendor is unblocked; if this waits, the shop cannot replenish the one-unit shortfall for the ticket."
+        }
+      ],
+      "cash_effect": -848.0,
+      "drafts_left_on_board": [
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "id": 102,
+      "subject": "Rent due",
+      "requester": "Elm City Properties",
+      "final_status": "resolved",
+      "outcome": "September rent of $2,400.00 for the Chapel Street shop queued and paid two days before its 2026-09-02 due date; lease next_due rolled to 2026-10-02; landlord draft on the board.",
+      "runs": 7,
+      "agents_involved": [
+        "accounting",
+        "boss",
+        "customer_service",
+        "facilities"
+      ],
+      "delegations": [
+        "boss -> accounting",
+        "boss -> facilities",
+        "facilities -> accounting",
+        "facilities -> customer_service"
+      ],
+      "agent_contributions": {
+        "accounting": {
+          "what_they_did": "Queued approval #3 for exactly $2,400.00 against lease 1 and confirmed the balance covered it.",
+          "mcp_tools_used": [
+            "get_rent_due",
+            "get_cash_balance",
+            "get_shop_today",
+            "request_payment_approval",
+            "list_open_invoices",
+            "list_pending_approvals",
+            "get_ticket",
+            "list_drafts"
+          ]
+        },
+        "boss": {
+          "what_they_did": "Routed to facilities on the lease_id, confirmed an approval id actually existed before calling the ticket awaiting_approval, and resolved it once rent was paid.",
+          "mcp_tools_used": [
+            "get_ticket",
+            "update_ticket_status",
+            "get_shop_today",
+            "list_pending_approvals",
+            "list_drafts",
+            "get_cash_balance",
+            "get_rent_due"
+          ]
+        },
+        "customer_service": {
+          "what_they_did": "Drafted the note to Elm City Properties; left unsent on the board.",
+          "mcp_tools_used": [
+            "get_ticket",
+            "get_rent_due",
+            "save_draft_message"
+          ]
+        },
+        "facilities": {
+          "what_they_did": "Read lease 1 \u2014 $2,400.00 due 2026-09-02, 2 days out, not overdue \u2014 and asked accounting to queue it, holding no payment tool itself.",
+          "mcp_tools_used": [
+            "get_ticket",
+            "get_rent_due",
+            "get_cash_balance",
+            "get_shop_today",
+            "list_pending_approvals",
+            "list_drafts"
+          ]
+        }
+      },
+      "human_approvals": [
+        {
+          "approval_id": 3,
+          "kind": "rent",
+          "ref_id": 1,
+          "amount": 2400.0,
+          "status": "paid",
+          "requested_by_agent": "accounting",
+          "approved_by_human": "Jennifer Pham",
+          "decided_at": "2026-08-31",
+          "payment_id": 3,
+          "reason_shown_to_human": "Queue September rent for the Chapel Street shop, due 2026-09-02 (2 days from shop date 2026-08-31), to keep the lease current; if it waits past the due date, the shop risks falling behind on rent. Checking balance is $2,552.00 and no requests are currently pending, leaving $152.00 if this request is paid."
+        }
+      ],
+      "cash_effect": -2400.0,
+      "drafts_left_on_board": [
+        4
+      ]
+    },
+    {
+      "id": 103,
+      "subject": "Bulk hoodie discount",
+      "requester": "Yale AI Club",
+      "final_status": "resolved",
+      "outcome": "Partial offer: 8 of the 20 size-M hoodies are available at the $58.00 list price ($22.00 cost floor, 62.07% max discount). The 12-unit restock would cost $264.00 against $152.00 of cash, so PO #2 was cancelled rather than left unfundable, and the club was told what the shop can and cannot do.",
+      "runs": 2,
+      "agents_involved": [
+        "accounting",
+        "boss",
+        "customer_service",
+        "inventory"
+      ],
+      "delegations": [
+        "boss -> accounting",
+        "boss -> customer_service",
+        "boss -> inventory",
+        "customer_service -> accounting",
+        "customer_service -> inventory",
+        "inventory -> accounting"
+      ],
+      "agent_contributions": {
+        "accounting": {
+          "what_they_did": "Produced the floor: $22.00 cost against $58.00 list, $36.00 margin per unit, 62.07% maximum discount, and flagged the $112.00 funding gap.",
+          "mcp_tools_used": [
+            "get_sku_margin",
+            "check_stock",
+            "list_pending_approvals",
+            "get_ticket",
+            "list_purchase_orders",
+            "get_cash_balance",
+            "find_restock_options"
+          ]
+        },
+        "boss": {
+          "what_they_did": "Routed to accounting first because the ask was a price, took the partial-fill decision, and resolved the ticket with an honest 'partly no' rather than leaving it open.",
+          "mcp_tools_used": [
+            "get_ticket",
+            "get_sku_margin",
+            "check_stock",
+            "get_shop_today",
+            "list_pending_approvals",
+            "update_ticket_status"
+          ]
+        },
+        "customer_service": {
+          "what_they_did": "Drafted the counter-offer to the Yale AI Club: 8 available now, the other 12 unconfirmed, no discount promised that was not approved.",
+          "mcp_tools_used": [
+            "get_ticket",
+            "save_draft_message",
+            "list_drafts",
+            "check_stock",
+            "get_sku_margin",
+            "find_restock_options",
+            "list_purchase_orders",
+            "list_pending_approvals"
+          ]
+        },
+        "inventory": {
+          "what_they_did": "Found 8 of 20 size-M hoodies on hand (shortfall 12), created PO #2 for the 12 at $264.00, then cancelled it when the cash would not cover it.",
+          "mcp_tools_used": [
+            "get_ticket",
+            "check_stock",
+            "list_stock_for_sku",
+            "find_restock_options",
+            "get_shop_today",
+            "list_purchase_orders",
+            "create_purchase_order",
+            "get_cash_balance",
+            "cancel_purchase_order"
+          ]
+        }
+      },
+      "human_approvals": [],
+      "cash_effect": 0.0,
+      "drafts_left_on_board": [
+        5,
+        6
+      ]
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+# Campus Customs — Python dependencies
+#
+#   python3 -m venv .venv
+#   .venv/bin/pip install -r requirements.txt
+#
+# Developed on Python 3.13. The frontend's dependencies live in frontend/package.json.
+
+# MCP server over the shop database
+fastmcp==4.1.0
+
+# The five-agent team. The [openai] extra supplies the OpenAI-compatible client that
+# talks to gpt-6-luna through the Portkey gateway; [mcp] connects agents to the server.
+pydantic-ai-slim[openai,mcp]==2.55.0
+
+# FastAPI backend the React dashboard calls
+fastapi==0.143.0
+uvicorn[standard]==0.54.0
+
+# Reads PORTKEY_API_KEY out of .env
+python-dotenv==1.2.4

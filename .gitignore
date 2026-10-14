@@ -1,0 +1,21 @@
+# Secrets -- never commit the Portkey key
+.env
+.env.local
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+
+# Node / React
+node_modules/
+frontend/dist/
+
+# Editor and tooling
+.claude/
+.DS_Store
+
+# Working scratch
+*.tmp
+data/*.tmp
+output/*.unreadable.json

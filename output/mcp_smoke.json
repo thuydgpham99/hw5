@@ -1,0 +1,151 @@
+{
+  "what_this_is": "Smoke test of every tool on the campus-customs MCP server. Each entry is the prompt asked, the tool that answered it, the tool's output, and the rows in data/campus_customs_new.db those values came from.",
+  "generated_at": "2026-10-13T17:10:43-04:00",
+  "mcp_server": {
+    "name": "campus-customs",
+    "connection_json": ".mcp.json at the project root",
+    "transport": "stdio",
+    "command": "./.venv/bin/python mcp_server/server.py"
+  },
+  "database": "data/campus_customs_new.db",
+  "shop_today_desk_date_today": "2026-08-31",
+  "tools_listed_by_server": [
+    "check_stock",
+    "get_rent_due",
+    "get_sku_margin"
+  ],
+  "tests": [
+    {
+      "ticket": 101,
+      "prompt_to_vibe_coder": "Ticket 101 is a customer order from Tauhid Zaman for one Bulldog tee, CC-TEE-WHITE in size S. Use the campus-customs MCP server to check whether we can fill it out of stock right now, and if not, how short we are.",
+      "tool_name": "check_stock",
+      "arguments": {
+        "sku": "CC-TEE-WHITE",
+        "size": "S",
+        "qty_needed": 1
+      },
+      "tool_output": {
+        "found": true,
+        "sku": "CC-TEE-WHITE",
+        "name": "Classic Bulldog Tee",
+        "size": "S",
+        "qty_on_hand": 0,
+        "location": "Aisle B",
+        "qty_needed": 1,
+        "can_fill_now": false,
+        "shortfall": 1
+      },
+      "db_verification": {
+        "sql": "SELECT sku, name, size, qty, location FROM inventory WHERE sku=? AND size=?",
+        "params": [
+          "CC-TEE-WHITE",
+          "S"
+        ],
+        "rows_in_campus_customs_new_db": [
+          {
+            "sku": "CC-TEE-WHITE",
+            "name": "Classic Bulldog Tee",
+            "size": "S",
+            "qty": 0,
+            "location": "Aisle B"
+          }
+        ],
+        "field_matches": {
+          "sku -> sku": true,
+          "name -> name": true,
+          "size -> size": true,
+          "qty -> qty_on_hand": true,
+          "location -> location": true
+        },
+        "all_match": true
+      }
+    },
+    {
+      "ticket": 102,
+      "prompt_to_vibe_coder": "Ticket 102 is the rent notice from Elm City Properties on lease 1. Use the campus-customs MCP server to tell me how much rent is due, on what date, and whether it is already overdue as of the shop's today.",
+      "tool_name": "get_rent_due",
+      "arguments": {
+        "lease_id": 1
+      },
+      "tool_output": {
+        "found": true,
+        "lease_id": 1,
+        "space_name": "Chapel Street shop",
+        "landlord": "Elm City Properties",
+        "monthly_rent": 2400.0,
+        "next_due": "2026-09-02",
+        "notes": null,
+        "shop_today": "2026-08-31",
+        "days_until_due": 2,
+        "is_overdue": false
+      },
+      "db_verification": {
+        "sql": "SELECT id, space_name, landlord, monthly_rent, next_due FROM leases WHERE id=?",
+        "params": [
+          1
+        ],
+        "rows_in_campus_customs_new_db": [
+          {
+            "id": 1,
+            "space_name": "Chapel Street shop",
+            "landlord": "Elm City Properties",
+            "monthly_rent": 2400.0,
+            "next_due": "2026-09-02"
+          }
+        ],
+        "field_matches": {
+          "id -> lease_id": true,
+          "space_name -> space_name": true,
+          "landlord -> landlord": true,
+          "monthly_rent -> monthly_rent": true,
+          "next_due -> next_due": true
+        },
+        "all_match": true
+      }
+    },
+    {
+      "ticket": 103,
+      "prompt_to_vibe_coder": "Ticket 103 is the Yale AI Club asking for a bulk discount on 20 CC-HOOD-NAVY hoodies in size M. Use the campus-customs MCP server to tell me our unit cost, list price, and how deep a discount we could give before we lose money.",
+      "tool_name": "get_sku_margin",
+      "arguments": {
+        "sku": "CC-HOOD-NAVY",
+        "qty": 20
+      },
+      "tool_output": {
+        "found": true,
+        "sku": "CC-HOOD-NAVY",
+        "unit_cost": 22.0,
+        "list_price": 58.0,
+        "unit_margin": 36.0,
+        "margin_pct_of_list": 62.07,
+        "max_discount_pct_before_loss": 62.07,
+        "break_even_unit_price": 22.0,
+        "qty": 20,
+        "revenue_at_list": 1160.0,
+        "cost_at_qty": 440.0,
+        "margin_at_list": 720.0
+      },
+      "db_verification": {
+        "sql": "SELECT sku, unit_cost, list_price FROM pricing WHERE sku=?",
+        "params": [
+          "CC-HOOD-NAVY"
+        ],
+        "rows_in_campus_customs_new_db": [
+          {
+            "sku": "CC-HOOD-NAVY",
+            "unit_cost": 22.0,
+            "list_price": 58.0
+          }
+        ],
+        "field_matches": {
+          "sku -> sku": true,
+          "unit_cost -> unit_cost": true,
+          "list_price -> list_price": true
+        },
+        "all_match": true
+      }
+    }
+  ],
+  "all_tools_tested": true,
+  "all_outputs_match_db": true
+}
