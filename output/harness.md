@@ -319,9 +319,11 @@ absolute paths. That file is outside the repo and is not part of the submission.
 
 ### Smoke test
 
-Evidence: **`output/mcp_smoke.json`**. Every tool was called over the real MCP stdio protocol, with
-the server spawned from the exact command line in `.mcp.json`, and every value in every response
-was checked back against `data/campus_customs_new.db`.
+Evidence: **`output/mcp_smoke.json`**. Every tool was called **natively by the connected vibe
+coder** — Claude Code loaded `campus-customs` from `.mcp.json` at startup and exposed its tools as
+`mcp__campus-customs__*`, so each call below was a tool call in the chat rather than a script. The
+database was reset from the original immediately beforehand, and every value in every response was
+checked back against `data/campus_customs_new.db` with SQL.
 
 | Ticket | Tool | Arguments | Headline result | Matches DB |
 |---|---|---|---|---|

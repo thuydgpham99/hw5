@@ -1,24 +1,24 @@
 {
   "what_this_is": "Smoke test of every tool on the campus-customs MCP server. Each entry is the prompt asked, the tool that answered it, the tool's output, and the rows in data/campus_customs_new.db those values came from.",
-  "generated_at": "2026-10-13T17:10:43-04:00",
+  "how_the_calls_were_made": "Natively, by the connected vibe coder. The campus-customs server is registered in .mcp.json at the project root; Claude Code loaded it at startup and exposed its tools as mcp__campus-customs__*. Each call below was issued as a tool call in the chat, not from a client script, and the tool_output field is the server's verbatim response.",
+  "generated_at": "2026-10-13T22:05:00-04:00",
   "mcp_server": {
     "name": "campus-customs",
     "connection_json": ".mcp.json at the project root",
     "transport": "stdio",
-    "command": "./.venv/bin/python mcp_server/server.py"
+    "command": "./mcp_server/run.sh",
+    "tool_count_at_time_of_test": 22,
+    "note": "This file tests the three tools from Problem 3. The server has since grown to 22 tools; the full list and the table each one reads is in output/harness.md section 8."
   },
   "database": "data/campus_customs_new.db",
+  "database_state": "Reset from the untouched original with `python backend/reset_db.py` immediately before these calls, so the values below are the shop's starting state: 3 open tickets, checking $3,400.00, invoice 501 unpaid.",
   "shop_today_desk_date_today": "2026-08-31",
-  "tools_listed_by_server": [
-    "check_stock",
-    "get_rent_due",
-    "get_sku_margin"
-  ],
   "tests": [
     {
       "ticket": 101,
       "prompt_to_vibe_coder": "Ticket 101 is a customer order from Tauhid Zaman for one Bulldog tee, CC-TEE-WHITE in size S. Use the campus-customs MCP server to check whether we can fill it out of stock right now, and if not, how short we are.",
       "tool_name": "check_stock",
+      "tool_call_as_issued": "mcp__campus-customs__check_stock",
       "arguments": {
         "sku": "CC-TEE-WHITE",
         "size": "S",
@@ -36,11 +36,8 @@
         "shortfall": 1
       },
       "db_verification": {
-        "sql": "SELECT sku, name, size, qty, location FROM inventory WHERE sku=? AND size=?",
-        "params": [
-          "CC-TEE-WHITE",
-          "S"
-        ],
+        "sql": "SELECT sku, name, size, qty, location FROM inventory WHERE sku = ? AND size = ?",
+        "params": ["CC-TEE-WHITE", "S"],
         "rows_in_campus_customs_new_db": [
           {
             "sku": "CC-TEE-WHITE",
@@ -57,6 +54,10 @@
           "qty -> qty_on_hand": true,
           "location -> location": true
         },
+        "derived_fields_checked": {
+          "can_fill_now": "qty_on_hand 0 >= qty_needed 1 is false -> false",
+          "shortfall": "max(0, 1 - 0) = 1"
+        },
         "all_match": true
       }
     },
@@ -64,6 +65,7 @@
       "ticket": 102,
       "prompt_to_vibe_coder": "Ticket 102 is the rent notice from Elm City Properties on lease 1. Use the campus-customs MCP server to tell me how much rent is due, on what date, and whether it is already overdue as of the shop's today.",
       "tool_name": "get_rent_due",
+      "tool_call_as_issued": "mcp__campus-customs__get_rent_due",
       "arguments": {
         "lease_id": 1
       },
@@ -72,7 +74,7 @@
         "lease_id": 1,
         "space_name": "Chapel Street shop",
         "landlord": "Elm City Properties",
-        "monthly_rent": 2400.0,
+        "monthly_rent": 2400,
         "next_due": "2026-09-02",
         "notes": null,
         "shop_today": "2026-08-31",
@@ -80,10 +82,8 @@
         "is_overdue": false
       },
       "db_verification": {
-        "sql": "SELECT id, space_name, landlord, monthly_rent, next_due FROM leases WHERE id=?",
-        "params": [
-          1
-        ],
+        "sql": "SELECT id, space_name, landlord, monthly_rent, next_due FROM leases WHERE id = ?",
+        "params": [1],
         "rows_in_campus_customs_new_db": [
           {
             "id": 1,
@@ -100,6 +100,11 @@
           "monthly_rent -> monthly_rent": true,
           "next_due -> next_due": true
         },
+        "derived_fields_checked": {
+          "shop_today": "SELECT date_today FROM desk -> 2026-08-31, matches",
+          "days_until_due": "2026-09-02 minus 2026-08-31 = 2",
+          "is_overdue": "days_until_due 2 < 0 is false -> false"
+        },
         "all_match": true
       }
     },
@@ -107,6 +112,7 @@
       "ticket": 103,
       "prompt_to_vibe_coder": "Ticket 103 is the Yale AI Club asking for a bulk discount on 20 CC-HOOD-NAVY hoodies in size M. Use the campus-customs MCP server to tell me our unit cost, list price, and how deep a discount we could give before we lose money.",
       "tool_name": "get_sku_margin",
+      "tool_call_as_issued": "mcp__campus-customs__get_sku_margin",
       "arguments": {
         "sku": "CC-HOOD-NAVY",
         "qty": 20
@@ -114,22 +120,20 @@
       "tool_output": {
         "found": true,
         "sku": "CC-HOOD-NAVY",
-        "unit_cost": 22.0,
-        "list_price": 58.0,
-        "unit_margin": 36.0,
+        "unit_cost": 22,
+        "list_price": 58,
+        "unit_margin": 36,
         "margin_pct_of_list": 62.07,
         "max_discount_pct_before_loss": 62.07,
-        "break_even_unit_price": 22.0,
+        "break_even_unit_price": 22,
         "qty": 20,
-        "revenue_at_list": 1160.0,
-        "cost_at_qty": 440.0,
-        "margin_at_list": 720.0
+        "revenue_at_list": 1160,
+        "cost_at_qty": 440,
+        "margin_at_list": 720
       },
       "db_verification": {
-        "sql": "SELECT sku, unit_cost, list_price FROM pricing WHERE sku=?",
-        "params": [
-          "CC-HOOD-NAVY"
-        ],
+        "sql": "SELECT sku, unit_cost, list_price FROM pricing WHERE sku = ?",
+        "params": ["CC-HOOD-NAVY"],
         "rows_in_campus_customs_new_db": [
           {
             "sku": "CC-HOOD-NAVY",
@@ -142,10 +146,20 @@
           "unit_cost -> unit_cost": true,
           "list_price -> list_price": true
         },
+        "derived_fields_checked": {
+          "unit_margin": "58.00 - 22.00 = 36.00",
+          "margin_pct_of_list": "100 * 36 / 58 = 62.07",
+          "max_discount_pct_before_loss": "same figure: discounting more than 62.07% puts the unit below the 22.00 cost",
+          "break_even_unit_price": "equals unit_cost 22.00",
+          "revenue_at_list": "58.00 * 20 = 1160.00",
+          "cost_at_qty": "22.00 * 20 = 440.00",
+          "margin_at_list": "36.00 * 20 = 720.00"
+        },
         "all_match": true
       }
     }
   ],
-  "all_tools_tested": true,
-  "all_outputs_match_db": true
+  "all_three_tools_tested": true,
+  "all_outputs_match_db": true,
+  "note_on_database_state_afterwards": "The working copy was restored to the finished-run state (3 tickets resolved, checking $152.00) after this test, so it still matches output/resolved_tickets.json and output/resolved_board.html. Re-running this test only requires `python backend/reset_db.py` first."
 }

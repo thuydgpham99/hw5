@@ -179,9 +179,15 @@ it reads it from the folder *above* this repo, so writing `.mcp.json` alone prov
   a public clone works without my home directory in it.
 - `campus-customs` also added to `/Users/jenniferpham/Desktop/AI Foundation/.mcp.json` (outside the
   repo), since that's the file this session's Claude Code actually loads. Backed it up first.
-- `output/mcp_smoke.json` — all three tools called over MCP stdio, each with the prompt, tool name,
-  arguments, full output, the SQL used to verify it, and the matching rows.
-  `all_tools_tested: true`, `all_outputs_match_db: true`.
+- `output/mcp_smoke.json` — all three tools called, each with the prompt, tool name, arguments,
+  full output, the SQL used to verify it, and the matching rows. `all_outputs_match_db: true`.
+- **Redone properly later.** On the first pass the tools were not callable in my open chat — Claude
+  Code reads its MCP list once at startup, and that session predated `.mcp.json` — so I drove the
+  server over the real MCP stdio protocol from a client script. After finishing the assignment I
+  restarted the app, `campus-customs` connected, and I re-ran all three as genuine in-chat tool
+  calls (`mcp__campus-customs__check_stock`, `get_rent_due`, `get_sku_margin`) against a freshly
+  reset database. `mcp_smoke.json` now records that provenance explicitly, and the working copy was
+  restored to the finished-run state afterwards so the other deliverables still match.
 - Confirmed against the DB: tee size S is at **0** (shortfall 1), rent is **$2,400 due 2026-09-02,
   2 days out, not overdue**, hoodies are **$22 cost / $58 list → 62.07% max discount**.
 
