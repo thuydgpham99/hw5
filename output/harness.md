@@ -428,6 +428,8 @@ are in no agent's toolset at all.
 | `create_purchase_order` | `purchase_orders` | `vendors`, `invoices`, `pricing`, `inventory`, `desk` | inventory |
 | `request_payment_approval` | `approvals` | `invoices`, `leases`, `purchase_orders`, `cash_accounts`, `desk` | accounting |
 | `save_draft_message` | `drafts` | `tickets`, `desk` | customer_service |
+| `revise_draft` | `drafts` | `desk` | customer_service |
+| `cancel_purchase_order` | `purchase_orders` | — | inventory |
 
 ### Human-only — no agent can reach these
 
@@ -695,8 +697,16 @@ approval gates a ticket has, the more times it comes back to the board.
 
 ### Final tool count
 
-21 MCP tools: 14 reads, 5 agent writes (`update_ticket_status`, `create_purchase_order`,
-`cancel_purchase_order`, `request_payment_approval`, `save_draft_message`), and 2 human-only
-(`decide_approval`, `pay_approved`). `cancel_purchase_order` was added during the full run, when
-ticket 103 produced a purchase order the shop could not fund and there was no honest way to take it
-off the board.
+**22 MCP tools:** 14 reads, 6 agent writes (`update_ticket_status`, `create_purchase_order`,
+`cancel_purchase_order`, `request_payment_approval`, `save_draft_message`, `revise_draft`), and
+2 human-only (`decide_approval`, `pay_approved`).
+
+Two of those were added because the run demanded them, not because the design predicted them:
+
+- **`cancel_purchase_order`** — ticket 103 produced a $264.00 purchase order the shop could not
+  fund, and there was no honest way to take it off the board.
+- **`revise_draft`** — ticket 101 produced *three* near-identical customer drafts, one per run,
+  because `save_draft_message` only ever inserts. Two of them were factually stale by the end. The
+  reflection on the Reflection tab named this as a defect; this is the fix. Verified by re-running
+  ticket 101 after adding it: **no new draft was created** — customer service read the board, judged
+  the existing draft current, and left it alone.

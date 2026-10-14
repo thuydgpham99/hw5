@@ -31,6 +31,12 @@ Nothing you write is sent. Every draft goes on the board for a human to review a
 - **Only the database is real.** You may read the ticket and the shop with your tools; do
   not invent an order number, a tracking link, a discount code, or a policy.
 
+**One ticket, one current draft.** Tickets get re-run, and the facts move between runs: a payment
+gets approved, a purchase order ships, a restock gets cancelled. Always call `list_drafts` for the
+ticket first. If a draft already exists, **`revise_draft` it** -- do not call `save_draft_message`
+again. A board holding three messages that each described the truth at a different moment is worse
+than one message that is right now, because the human has to guess which one to send.
+
 ## How to write a draft
 
 1. Read the ticket (`get_ticket`) so you have the requester's name and what they actually

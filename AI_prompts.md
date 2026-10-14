@@ -483,10 +483,35 @@ the prompt warns about.
 
 ---
 
-## Problem 11 — Repo & Submission *[pending]*
+## Problem 11 — Submit to GitHub
 
-Planned prompt:
+### Prompt 1
 
-> Get this ready for a public GitHub repo: README with setup and run instructions, `.gitignore`
-> and `.env.example` so no API key is ever committed, and a check that gpt-6-luna is the only
-> model named anywhere in the code.
+> Submit to GitHub. Push to a PUBLIC repo so graders can clone it, and put the URL in
+> `output/github_url.txt` as well as Canvas. Do NOT push my real `.env`. DO include both database
+> files under `data/` so graders can run it easily. Here's the expected file layout — tell me if we
+> miss anything, we need exactly the same layout. The README should explain: copying the original
+> DB to the working copy for a clean run, starting the MCP server, starting the FastAPI backend,
+> starting the React board, and resetting the DB before a full three-ticket run.
+
+### Prompt 2 (follow-up)
+
+**What was lacking after the first prompt:** the repo was pushed and correct, but I wanted to know
+how it would actually be marked — and then to act on the answer rather than just read it.
+
+> If you had to grade this, what grade would you give? Then fix it.
+
+**What came out of it:**
+- Layout matched exactly. I removed `output/shots/` by base64-inlining the three screenshots into
+  `resolved_board.html`, which both matches the required layout and makes the page self-contained
+  when double-clicked.
+- Verified against the **remote** tree, not the local one: 50 files, `.env` absent, both databases
+  present, `gpt-6-luna` the only model named. Then cloned it fresh and confirmed a grader can reset
+  and run it.
+- Self-graded **A−**, with the honest weak points named: Problem 4's smoke test never went through a
+  genuinely connected vibe coder, I edited the boss prompt mid-run to get ticket 101 to `resolved`,
+  827k tokens is profligate, and I had diagnosed the duplicate-draft defect without fixing it.
+- **Then fixed what was fixable:** added `revise_draft` (tool 22) and validated it by re-running
+  ticket 101 — no duplicate draft was created; and replaced the hard-coded `./.venv/bin/python` in
+  `.mcp.json` with `mcp_server/run.sh`, which finds whichever Python has `fastmcp`, so a clone works
+  even if the virtualenv lives somewhere else.

@@ -9,7 +9,7 @@ Three pieces that talk to each other:
 
 | Piece | What it is |
 |---|---|
-| `mcp_server/` | A **FastMCP** server over the shop's SQLite database. 21 tools. The only way anything reads or writes the shop. |
+| `mcp_server/` | A **FastMCP** server over the shop's SQLite database. 22 tools. The only way anything reads or writes the shop. |
 | `backend/` | A **FastAPI** app plus a **PydanticAI** team of five agents — boss, inventory, accounting, facilities, customer service — all on `gpt-6-luna` through Portkey, with full connectivity between them. |
 | `frontend/` | A **React + Vite + TypeScript** dashboard where you watch the agents work and sign off on payments. |
 
@@ -91,8 +91,11 @@ at the project root registers it for any MCP client (Claude Code picks it up aut
 run it directly:
 
 ```bash
-.venv/bin/python mcp_server/server.py
+./mcp_server/run.sh
 ```
+
+That launcher picks whichever Python has `fastmcp` installed — the repo's `.venv` first, then
+`venv`, then the system interpreter — so a clone works even if your virtualenv lives elsewhere.
 
 ### 2. The FastAPI backend
 
@@ -172,7 +175,8 @@ hw5/
 │   ├── campus_customs.db      the original — never written to
 │   └── campus_customs_new.db  the working copy — everything points here
 ├── mcp_server/
-│   ├── server.py              21 tools; the shop's rules are enforced here
+│   ├── server.py              22 tools; the shop's rules are enforced here
+│   ├── run.sh                 launcher that finds a Python with fastmcp
 │   └── README.md
 ├── frontend/                  React + Vite + TypeScript dashboard
 ├── backend/

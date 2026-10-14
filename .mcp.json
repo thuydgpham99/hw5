@@ -2,10 +2,8 @@
   "mcpServers": {
     "campus-customs": {
       "type": "stdio",
-      "command": "./.venv/bin/python",
-      "args": [
-        "mcp_server/server.py"
-      ],
+      "command": "./mcp_server/run.sh",
+      "args": [],
       "env": {}
     }
   }

@@ -66,8 +66,10 @@ re-copies the original and clears them.
 | Tool | Table(s) | Refuses when |
 |---|---|---|
 | `save_draft_message(ticket_id, audience, subject, body, drafted_by)` | `drafts` | the ticket does not exist |
+| `revise_draft(draft_id, subject, body, revised_by)` | `drafts` | the draft does not exist |
 | `update_ticket_status(ticket_id, status, resolution_note)` | `tickets` | the status is not a known one |
 | `create_purchase_order(ticket_id, vendor_id, sku, size, qty, created_by)` | `purchase_orders` (reads `vendors`, `invoices`, `pricing`, `desk`) | the vendor has an unpaid invoice, the SKU has no price, or the shop does not carry that size |
+| `cancel_purchase_order(po_id, reason, cancelled_by)` | `purchase_orders` | the PO is already ordered, or an approval still points at it |
 | `request_payment_approval(kind, ref_id, amount, reason, requested_by, ticket_id=None, account="checking")` | `approvals` (validates against `invoices` / `leases` / `purchase_orders`) | the amount does not match the record, or the record is already settled |
 
 ### Human-only — the backend calls these for a person
@@ -90,8 +92,12 @@ Registered in `.mcp.json` at the project root, so a vibe coder picks it up autom
 To run it by hand:
 
 ```bash
-python mcp_server/server.py
+./mcp_server/run.sh
 ```
+
+That launcher finds whichever Python has `fastmcp` installed (the repo's `.venv` first, then
+`venv`, then the system interpreter), so a clone works without the virtualenv being in an exact
+place. `.mcp.json` points at it.
 
 Dependencies: `pip install fastmcp` (developed against FastMCP 4.1.0, Python 3.13).
 

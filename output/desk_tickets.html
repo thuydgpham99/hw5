@@ -970,7 +970,12 @@
         flat <code>drafts</code> table, so a ticket has one conversation rather than a pile of
         snapshots.</li>
       <li><strong><code>revise_draft(draft_id, …)</code></strong> so a re-run updates its draft instead
-        of adding a duplicate — a small tool that would have removed two of ticket 101's three drafts.</li>
+        of adding a duplicate — a small tool that would have removed two of ticket 101's three drafts.
+        <span class="pill good">built after this reflection</span> It is tool 22 on the server, scoped
+        to customer service, and <code>save_draft_message</code> now tells the agent to check
+        <code>list_drafts</code> first. Verified by re-running ticket 101 with it in place: <strong>no
+        fourth draft was created</strong> — customer service read the board, judged the existing draft
+        current, and left it alone.</li>
       <li><strong><code>send_message(draft_id)</code> as a human-only tool</strong>, sitting beside
         <code>decide_approval</code> and <code>pay_approved</code> in the wall agents cannot reach.
         Sending is irreversible in exactly the way paying is, so it deserves the same slip on the

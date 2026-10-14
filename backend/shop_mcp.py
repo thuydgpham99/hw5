@@ -54,7 +54,7 @@ ROLE_WRITE_TOOLS: Dict[str, Set[str]] = {
     "inventory": {"create_purchase_order", "cancel_purchase_order"},
     "accounting": {"request_payment_approval"},
     "facilities": set(),          # rent money is requested by accounting, on request
-    "customer_service": {"save_draft_message"},
+    "customer_service": {"save_draft_message", "revise_draft"},
 }
 
 # The human's half of the loop. Not reachable from any agent toolset.

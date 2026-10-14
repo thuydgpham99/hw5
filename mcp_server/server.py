@@ -50,7 +50,8 @@ CREATE TABLE IF NOT EXISTS drafts (
     subject     TEXT NOT NULL,
     body        TEXT NOT NULL,
     drafted_by  TEXT NOT NULL,
-    created_at  TEXT NOT NULL
+    created_at  TEXT NOT NULL,
+    revision    INTEGER NOT NULL DEFAULT 1
 );
 CREATE TABLE IF NOT EXISTS approvals (
     id            INTEGER PRIMARY KEY,
@@ -102,6 +103,11 @@ def _ensure_workspace_tables() -> None:
     """Create the drafts/approvals/purchase_orders tables if this working copy is fresh."""
     with _connect(write=True) as conn:
         conn.executescript(WORKSPACE_SCHEMA)
+        # Added after the first run: lets a draft be revised in place rather than
+        # duplicated. Guarded so an existing working copy migrates instead of breaking.
+        cols = {r["name"] for r in conn.execute("PRAGMA table_info(drafts)")}
+        if "revision" not in cols:
+            conn.execute("ALTER TABLE drafts ADD COLUMN revision INTEGER NOT NULL DEFAULT 1")
 
 
 def _rows(sql: str, params: tuple = ()) -> List[Dict[str, Any]]:
@@ -492,6 +498,9 @@ def save_draft_message(
 
     Writes drafts. Nothing is emailed and no vendor is contacted -- the draft stays on the
     board. audience is who it is addressed to, e.g. 'customer' or 'landlord'.
+
+    Only for a ticket that has no draft yet. If one already exists, use revise_draft so the
+    board holds one current message rather than a pile of stale ones.
     """
     ticket = _one("SELECT id FROM tickets WHERE id = ?", (ticket_id,))
     if ticket is None:
@@ -512,6 +521,38 @@ def save_draft_message(
         "ticket_id": ticket_id,
         "audience": audience,
         "status": "saved_to_board_not_sent",
+    }
+
+
+@mcp.tool()
+def revise_draft(draft_id: int, subject: str, body: str, revised_by: str) -> Dict[str, Any]:
+    """Rewrite a draft that is already on the board, in place.
+
+    Writes drafts. Use this instead of save_draft_message whenever a draft for this ticket
+    already exists -- facts change between runs (an approval lands, a purchase order ships,
+    a restock is cancelled), and a second near-identical draft leaves a human choosing
+    between two messages where one is quietly out of date. Call list_drafts first to see
+    whether you are writing a new message or correcting an old one.
+    """
+    row = _one("SELECT id, ticket_id, revision FROM drafts WHERE id = ?", (draft_id,))
+    if row is None:
+        return {"ok": False, "error": f"No draft {draft_id}."}
+
+    today = _today()
+    revision = (row["revision"] or 1) + 1
+    with _connect(write=True) as conn:
+        conn.executescript(WORKSPACE_SCHEMA)
+        conn.execute(
+            "UPDATE drafts SET subject = ?, body = ?, drafted_by = ?, created_at = ?, "
+            "revision = ? WHERE id = ?",
+            (subject, body, revised_by, today, revision, draft_id),
+        )
+    return {
+        "ok": True,
+        "draft_id": draft_id,
+        "ticket_id": row["ticket_id"],
+        "revision": revision,
+        "status": "revised_in_place_not_sent",
     }
 
 
